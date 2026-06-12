@@ -190,7 +190,7 @@ async function fetchLeads() {
     console.error('Error fetching leads:', err);
     document.getElementById('leads-table-body').innerHTML = `
       <tr>
-        <td colspan="8" style="text-align:center;color:#ef4444;padding:30px;">
+        <td colspan="9" style="text-align:center;color:#ef4444;padding:30px;">
           Failed to load leads from database.
         </td>
       </tr>
@@ -201,9 +201,87 @@ async function fetchLeads() {
 const searchQuery = document.getElementById('search-query');
 const filterBank = document.getElementById('filter-bank');
 const leadsTableBody = document.getElementById('leads-table-body');
+const selectAllLeads = document.getElementById('select-all-leads');
+const btnDeleteSelected = document.getElementById('btn-delete-selected');
+const deleteCount = document.getElementById('delete-count');
 
 searchQuery.addEventListener('input', applyFilters);
 filterBank.addEventListener('change', applyFilters);
+
+// Select/deselect all leads
+if (selectAllLeads) {
+  selectAllLeads.addEventListener('change', () => {
+    const checkboxes = document.querySelectorAll('.select-lead');
+    checkboxes.forEach(cb => cb.checked = selectAllLeads.checked);
+    updateDeleteButtonState();
+  });
+}
+
+// Event delegation for individual checkbox clicks
+if (leadsTableBody) {
+  leadsTableBody.addEventListener('change', (e) => {
+    if (e.target.classList.contains('select-lead')) {
+      updateDeleteButtonState();
+    }
+  });
+}
+
+function updateDeleteButtonState() {
+  if (!btnDeleteSelected || !deleteCount || !selectAllLeads) return;
+  const checkedBoxes = document.querySelectorAll('.select-lead:checked');
+  const count = checkedBoxes.length;
+  
+  if (count > 0) {
+    btnDeleteSelected.style.display = 'flex';
+    deleteCount.innerText = count;
+  } else {
+    btnDeleteSelected.style.display = 'none';
+  }
+  
+  const allBoxes = document.querySelectorAll('.select-lead');
+  if (allBoxes.length > 0 && count === allBoxes.length) {
+    selectAllLeads.checked = true;
+  } else {
+    selectAllLeads.checked = false;
+  }
+}
+
+// Bulk delete action handler
+if (btnDeleteSelected) {
+  btnDeleteSelected.addEventListener('click', async () => {
+    const checkedBoxes = document.querySelectorAll('.select-lead:checked');
+    const leadIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-id'));
+    if (leadIds.length === 0) return;
+
+    const confirmed = confirm(`Are you sure you want to permanently delete the ${leadIds.length} selected lead(s)? This action cannot be undone.`);
+    if (!confirmed) return;
+
+    try {
+      const res = await fetch('/api/leads', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-password': adminPassword
+        },
+        body: JSON.stringify({ leadIds })
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        // Clear checkbox states
+        if (selectAllLeads) selectAllLeads.checked = false;
+        btnDeleteSelected.style.display = 'none';
+        // Reload dashboard data
+        loadDashboardData();
+      } else {
+        alert('Error deleting leads: ' + data.message);
+      }
+    } catch (err) {
+      console.error('Delete request error:', err);
+      alert('Communication error with deletion API.');
+    }
+  });
+}
 
 function applyFilters() {
   const query = searchQuery.value.trim().toLowerCase();
@@ -230,11 +308,15 @@ function applyFilters() {
 
 function renderLeadsTable() {
   leadsTableBody.innerHTML = '';
+  
+  // Reset select-all checkbox and delete button state when rendering table
+  if (selectAllLeads) selectAllLeads.checked = false;
+  if (btnDeleteSelected) btnDeleteSelected.style.display = 'none';
 
   if (filteredLeads.length === 0) {
     leadsTableBody.innerHTML = `
       <tr>
-        <td colspan="8" style="text-align:center;padding:40px;color:var(--text-muted);">
+        <td colspan="9" style="text-align:center;padding:40px;color:var(--text-muted);">
           No matching client leads found.
         </td>
       </tr>
@@ -249,6 +331,7 @@ function renderLeadsTable() {
     
     const rowHtml = `
       <tr>
+        <td style="text-align: center;"><input type="checkbox" class="select-lead" data-id="${lead.lead_id}"></td>
         <td class="lead-id-cell">${lead.lead_id}</td>
         <td class="name-cell">${lead.name}</td>
         <td>${lead.phone}</td>

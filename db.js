@@ -137,6 +137,18 @@ const query = async (text, params = []) => {
     return { rows, rowCount: rows.length };
   }
 
+  // DELETE FROM leads WHERE lead_id = ANY($1)
+  if (cleanedText.startsWith('delete from leads')) {
+    const ids = params[0];
+    if (Array.isArray(ids)) {
+      const initialLength = jsonDb.leads.length;
+      jsonDb.leads = jsonDb.leads.filter(lead => !ids.includes(lead.lead_id));
+      saveJsonDb();
+      return { rows: [], rowCount: initialLength - jsonDb.leads.length };
+    }
+    return { rows: [], rowCount: 0 };
+  }
+
   // BEGIN / COMMIT / ROLLBACK
   if (['begin', 'commit', 'rollback'].includes(cleanedText)) {
     return { rows: [], rowCount: 0 };

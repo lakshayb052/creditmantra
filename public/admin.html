@@ -168,6 +168,11 @@
           </div>
           
           <div class="filter-controls">
+            <button id="btn-delete-selected" class="btn-danger" style="display: none;">
+              <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor;margin-right:6px;"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+              Delete Selected (<span id="delete-count">0</span>)
+            </button>
+            
             <select id="filter-bank">
               <option value="">All Banks</option>
               <option value="HDFC">HDFC Bank</option>
@@ -186,6 +191,7 @@
           <table id="leads-table">
             <thead>
               <tr>
+                <th style="width: 40px; text-align: center;"><input type="checkbox" id="select-all-leads"></th>
                 <th>URM / Lead ID</th>
                 <th>Name</th>
                 <th>Contact</th>
@@ -199,7 +205,7 @@
             <tbody id="leads-table-body">
               <!-- JS loads list here -->
               <tr>
-                <td colspan="8" style="text-align:center;padding:40px;color:var(--text-secondary);">Loading leads database...</td>
+                <td colspan="9" style="text-align:center;padding:40px;color:var(--text-secondary);">Loading leads database...</td>
               </tr>
             </tbody>
           </table>

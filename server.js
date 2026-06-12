@@ -158,6 +158,22 @@ app.get('/api/leads', adminAuth, async (req, res) => {
   }
 });
 
+// Delete leads in bulk or individually
+app.delete('/api/leads', adminAuth, async (req, res) => {
+  const { leadIds } = req.body;
+  if (!leadIds || !Array.isArray(leadIds)) {
+    return res.status(400).json({ success: false, message: 'Invalid lead IDs format. Array expected.' });
+  }
+
+  try {
+    const deleteRes = await db.query('DELETE FROM leads WHERE lead_id = ANY($1)', [leadIds]);
+    return res.json({ success: true, message: 'Leads deleted successfully.', deletedCount: deleteRes.rowCount });
+  } catch (err) {
+    console.error('Error deleting leads:', err.message);
+    return res.status(500).json({ success: false, message: 'Failed to delete leads.' });
+  }
+});
+
 // Retrieve dashboard statistics
 app.get('/api/admin/stats', adminAuth, async (req, res) => {
   try {
