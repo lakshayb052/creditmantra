@@ -184,6 +184,10 @@ const initDb = async () => {
         )
       `);
 
+      // Ensure UTM columns exist if the table was created in an older version of the app
+      await pool.query('ALTER TABLE leads ADD COLUMN IF NOT EXISTS utm_source VARCHAR(100)');
+      await pool.query('ALTER TABLE leads ADD COLUMN IF NOT EXISTS utm_info VARCHAR(100)');
+
       // Seed settings
       const seedDefaultSetting = async (key, val) => {
         const res = await pool.query('SELECT 1 FROM settings WHERE key = $1', [key]);
