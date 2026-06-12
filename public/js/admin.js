@@ -4,6 +4,8 @@
 let adminPassword = localStorage.getItem('creditmantra_admin_password') || '';
 let allLeads = [];
 let filteredLeads = [];
+let idleTimer = null;
+const IDLE_TIMEOUT = 5 * 60 * 1000; // 5 minutes in milliseconds
 
 const authGate = document.getElementById('auth-gate');
 const dashboardWrapper = document.getElementById('admin-dashboard');
@@ -27,10 +29,34 @@ function showAuthGate() {
 function hideAuthGate() {
   authGate.classList.add('hidden');
   dashboardWrapper.classList.remove('hidden');
+  resetIdleTimer();
 }
+
+function logoutAdmin() {
+  localStorage.removeItem('creditmantra_admin_password');
+  adminPassword = '';
+  allLeads = [];
+  filteredLeads = [];
+  clearTimeout(idleTimer);
+  showAuthGate();
+  alert('Session expired due to 5 minutes of inactivity. Please login again.');
+}
+
+function resetIdleTimer() {
+  if (!adminPassword) return; // Only track idle when logged in
+  clearTimeout(idleTimer);
+  idleTimer = setTimeout(logoutAdmin, IDLE_TIMEOUT);
+}
+
+// Track user activity to reset idle timer
+const activityEvents = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
+activityEvents.forEach(eventName => {
+  document.addEventListener(eventName, resetIdleTimer, true);
+});
 
 // Log out action
 btnLogout.addEventListener('click', () => {
+  clearTimeout(idleTimer);
   localStorage.removeItem('creditmantra_admin_password');
   adminPassword = '';
   allLeads = [];
