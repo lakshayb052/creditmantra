@@ -60,7 +60,7 @@ const adminAuth = async (req, res, next) => {
 
 // Capture a new lead
 app.post('/api/leads', async (req, res) => {
-  const { name, phone, email } = req.body;
+  const { name, phone, email, utm_source, utm_info } = req.body;
 
   if (!name || !phone || !email) {
     return res.status(400).json({ success: false, message: 'Name, phone and email are required.' });
@@ -71,30 +71,34 @@ app.post('/api/leads', async (req, res) => {
     const bankRes = await db.query("SELECT value FROM settings WHERE key = 'active_bank'");
     const activeBank = bankRes.rows.length > 0 ? bankRes.rows[0].value : 'HDFC';
 
-    // 2. Generate unique LeadID (URM No)
-    // Format: CM-{BANK}-{YYYYMMDD}-{4_RANDOM_DIGITS}
+    // 2. Count leads created today to generate sequential index
+    const countRes = await db.query("SELECT COUNT(*) FROM leads WHERE created_at >= CURRENT_DATE");
+    const countToday = parseInt(countRes.rows[0]?.count || 0);
+    const nextSeq = String(countToday + 1).padStart(3, '0');
+
+    // 3. Generate sequential LeadID (URM No)
+    // Format: CM{YYYYMMDD}{XXX}
     const today = new Date();
     const yyyy = today.getFullYear();
     const mm = String(today.getMonth() + 1).padStart(2, '0');
     const dd = String(today.getDate()).padStart(2, '0');
     const dateStr = `${yyyy}${mm}${dd}`;
-    const random = Math.floor(1000 + Math.random() * 9000);
-    const leadId = `CM-${activeBank}-${dateStr}-${random}`;
+    const leadId = `CM${dateStr}${nextSeq}`;
 
-    // 3. Save to database
+    // 4. Save to database
     await db.query(
-      'INSERT INTO leads (lead_id, name, phone, email, bank_name) VALUES ($1, $2, $3, $4, $5)',
-      [leadId, name, phone, email, activeBank]
+      'INSERT INTO leads (lead_id, name, phone, email, bank_name, utm_source, utm_info) VALUES ($1, $2, $3, $4, $5, $6, $7)',
+      [leadId, name, phone, email, activeBank, utm_source || '', utm_info || '']
     );
 
-    // 4. Retrieve bank redirect URL template
+    // 5. Retrieve bank redirect URL template
     const templateKey = `bank_${activeBank.toLowerCase()}_url`;
     const urlRes = await db.query('SELECT value FROM settings WHERE key = $1', [templateKey]);
     let redirectTemplate = urlRes.rows.length > 0 
       ? urlRes.rows[0].value 
-      : `https://www.hdfcbank.com/personal/save/cards/credit-cards?urm={urm}&name={name}&email={email}&phone={phone}`;
+      : `https://applyonline.hdfcbank.com/loan-against-assets/insta-jumbo-loan/insta-jumbo-form.html?XSELLINSHI=Y&XSELLINSLP=Y&Channel=DSA&DSACode=XRKD&LGCode=XRKD&LC1={urm}&LC2=XYZ001&SMCode=A28596&utm_source=DSA&utm_medium=XRKD#nbb`;
 
-    // 5. Replace placeholders
+    // 6. Replace placeholders
     const redirectUrl = redirectTemplate
       .replace(/{urm}/g, encodeURIComponent(leadId))
       .replace(/{name}/g, encodeURIComponent(name))

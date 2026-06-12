@@ -16,7 +16,7 @@ let jsonDb = {
   leads: [],
   settings: {
     active_bank: 'HDFC',
-    bank_hdfc_url: 'https://www.hdfcbank.com/personal/save/cards/credit-cards?urm={urm}&name={name}&email={email}&phone={phone}',
+    bank_hdfc_url: 'https://applyonline.hdfcbank.com/loan-against-assets/insta-jumbo-loan/insta-jumbo-form.html?XSELLINSHI=Y&XSELLINSLP=Y&Channel=DSA&DSACode=XRKD&LGCode=XRKD&LC1={urm}&LC2=XYZ001&SMCode=A28596&utm_source=DSA&utm_medium=XRKD#nbb',
     bank_icici_url: 'https://www.icicibank.com/personal-banking/cards/credit-card?urm={urm}&name={name}&email={email}&phone={phone}',
     bank_sbi_url: 'https://www.sbicard.com/en/personal/credit-cards.page?urm={urm}&name={name}&email={email}&phone={phone}',
     admin_password: 'admin123'
@@ -90,9 +90,9 @@ const query = async (text, params = []) => {
     return { rows: [], rowCount: 1 };
   }
 
-  // INSERT INTO leads (lead_id, name, phone, email, bank_name) VALUES ($1, $2, $3, $4, $5)
+  // INSERT INTO leads (lead_id, name, phone, email, bank_name, utm_source, utm_info) VALUES ($1, $2, $3, $4, $5, $6, $7)
   if (cleanedText.startsWith('insert into leads')) {
-    const [lead_id, name, phone, email, bank_name] = params;
+    const [lead_id, name, phone, email, bank_name, utm_source, utm_info] = params;
     const newLead = {
       id: jsonDb.leads.length + 1,
       lead_id,
@@ -100,6 +100,8 @@ const query = async (text, params = []) => {
       phone,
       email,
       bank_name,
+      utm_source: utm_source || '',
+      utm_info: utm_info || '',
       created_at: new Date().toISOString()
     };
     jsonDb.leads.push(newLead);
@@ -169,6 +171,8 @@ const initDb = async () => {
           phone VARCHAR(20) NOT NULL,
           email VARCHAR(100) NOT NULL,
           bank_name VARCHAR(50) DEFAULT 'HDFC',
+          utm_source VARCHAR(100),
+          utm_info VARCHAR(100),
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
       `);
@@ -189,7 +193,7 @@ const initDb = async () => {
       };
 
       await seedDefaultSetting('active_bank', 'HDFC');
-      await seedDefaultSetting('bank_hdfc_url', 'https://www.hdfcbank.com/personal/save/cards/credit-cards?urm={urm}&name={name}&email={email}&phone={phone}');
+      await seedDefaultSetting('bank_hdfc_url', 'https://applyonline.hdfcbank.com/loan-against-assets/insta-jumbo-loan/insta-jumbo-form.html?XSELLINSHI=Y&XSELLINSLP=Y&Channel=DSA&DSACode=XRKD&LGCode=XRKD&LC1={urm}&LC2=XYZ001&SMCode=A28596&utm_source=DSA&utm_medium=XRKD#nbb');
       await seedDefaultSetting('bank_icici_url', 'https://www.icicibank.com/personal-banking/cards/credit-card?urm={urm}&name={name}&email={email}&phone={phone}');
       await seedDefaultSetting('bank_sbi_url', 'https://www.sbicard.com/en/personal/credit-cards.page?urm={urm}&name={name}&email={email}&phone={phone}');
       await seedDefaultSetting('admin_password', 'admin123');

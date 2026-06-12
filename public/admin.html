@@ -191,13 +191,15 @@
                 <th>Contact</th>
                 <th>Email Address</th>
                 <th>Bank Partner</th>
+                <th>UTM Source</th>
+                <th>UTM Info</th>
                 <th>Captured Date</th>
               </tr>
             </thead>
             <tbody id="leads-table-body">
               <!-- JS loads list here -->
               <tr>
-                <td colspan="6" style="text-align:center;padding:40px;color:var(--text-secondary);">Loading leads database...</td>
+                <td colspan="8" style="text-align:center;padding:40px;color:var(--text-secondary);">Loading leads database...</td>
               </tr>
             </tbody>
           </table>
@@ -232,8 +234,8 @@
           <div class="content-card">
             <h2>Integration Endpoints & URL Templates</h2>
             <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:20px;">
-              Define the integration URLs for each bank. You can use dynamic variables which will be auto-replaced upon submission:
-              <br><strong>{urm}</strong> - Generated Lead ID • <strong>{name}</strong> - Name • <strong>{email}</strong> - Email • <strong>{phone}</strong> - Mobile Number.
+              Define the integration URLs for each bank. You have full control over where the Lead URM ID is parsed in the URL! Simply place <strong>{urm}</strong> where you want the ID (e.g. <code>LC1={urm}</code> or <code>id={urm}</code>). Other variables you can parse:
+              <br><strong>{urm}</strong> - Generated Lead ID • <strong>{name}</strong> - Client Name • <strong>{email}</strong> - Email Address • <strong>{phone}</strong> - Contact Number.
             </p>
 
             <form id="url-templates-form">

@@ -190,7 +190,7 @@ async function fetchLeads() {
     console.error('Error fetching leads:', err);
     document.getElementById('leads-table-body').innerHTML = `
       <tr>
-        <td colspan="6" style="text-align:center;color:#ef4444;padding:30px;">
+        <td colspan="8" style="text-align:center;color:#ef4444;padding:30px;">
           Failed to load leads from database.
         </td>
       </tr>
@@ -210,12 +210,14 @@ function applyFilters() {
   const bankFilter = filterBank.value;
 
   filteredLeads = allLeads.filter(lead => {
-    // Search filter
+    // Search filter (matches name, email, phone, URM ID, or UTM campaign details)
     const matchesSearch = 
       lead.name.toLowerCase().includes(query) ||
       lead.email.toLowerCase().includes(query) ||
       lead.phone.includes(query) ||
-      lead.lead_id.toLowerCase().includes(query);
+      lead.lead_id.toLowerCase().includes(query) ||
+      (lead.utm_source || '').toLowerCase().includes(query) ||
+      (lead.utm_info || '').toLowerCase().includes(query);
 
     // Bank filter
     const matchesBank = bankFilter === '' || lead.bank_name === bankFilter;
@@ -232,7 +234,7 @@ function renderLeadsTable() {
   if (filteredLeads.length === 0) {
     leadsTableBody.innerHTML = `
       <tr>
-        <td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted);">
+        <td colspan="8" style="text-align:center;padding:40px;color:var(--text-muted);">
           No matching client leads found.
         </td>
       </tr>
@@ -242,13 +244,18 @@ function renderLeadsTable() {
 
   filteredLeads.forEach(lead => {
     const date = new Date(lead.created_at).toLocaleString();
+    const utmSourceBadge = lead.utm_source ? `<span class="badge blue">${lead.utm_source}</span>` : '<span style="color:var(--text-muted);font-style:italic;">Direct</span>';
+    const utmInfoBadge = lead.utm_info ? `<span class="badge secondary">${lead.utm_info}</span>` : '-';
+    
     const rowHtml = `
       <tr>
         <td class="lead-id-cell">${lead.lead_id}</td>
         <td class="name-cell">${lead.name}</td>
         <td>${lead.phone}</td>
         <td>${lead.email}</td>
-        <td><span class="badge secondary">${lead.bank_name}</span></td>
+        <td><span class="badge success">${lead.bank_name}</span></td>
+        <td>${utmSourceBadge}</td>
+        <td>${utmInfoBadge}</td>
         <td class="date-cell">${date}</td>
       </tr>
     `;
@@ -265,7 +272,7 @@ document.getElementById('btn-export-csv').addEventListener('click', () => {
 
   const csvRows = [];
   // CSV Headers
-  csvRows.push(['URM_LeadID', 'ClientName', 'ContactPhone', 'EmailAddress', 'BankPartner', 'CreatedTimestamp'].join(','));
+  csvRows.push(['URM_LeadID', 'ClientName', 'ContactPhone', 'EmailAddress', 'BankPartner', 'UTM_Source', 'UTM_Info', 'CreatedTimestamp'].join(','));
 
   // CSV content
   filteredLeads.forEach(lead => {
@@ -276,6 +283,8 @@ document.getElementById('btn-export-csv').addEventListener('click', () => {
       `"${lead.phone}"`,
       `"${lead.email.replace(/"/g, '""')}"`,
       `"${lead.bank_name}"`,
+      `"${(lead.utm_source || '').replace(/"/g, '""')}"`,
+      `"${(lead.utm_info || '').replace(/"/g, '""')}"`,
       `"${date}"`
     ];
     csvRows.push(row.join(','));

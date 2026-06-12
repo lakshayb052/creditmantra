@@ -104,17 +104,27 @@
           <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
         </svg>
       </div>
-      <h2>Application Submitted!</h2>
-      <p>Thank you for applying. We have successfully registered your interest.</p>
+      <h2 id="success-modal-title">Application Submitted!</h2>
+      <p id="success-modal-desc">Thank you for applying. We have successfully registered your interest.</p>
       
       <div class="lead-id-container">
         <div class="lead-id-label">Your Lead ID / URM No.</div>
-        <div id="generated-urm" class="lead-id-value">CM-HDFC-XXXXXXXX-XXXX</div>
+        <div id="generated-urm" class="lead-id-value">CM-XXXXXXXX-XXX</div>
       </div>
 
-      <div class="redirect-text">
+      <!-- Container shown during immediate redirection -->
+      <div id="redirect-loading-container" class="redirect-text">
         <span>Redirecting you to bank portal...</span>
         <div class="countdown-spinner"></div>
+      </div>
+
+      <!-- Container shown when client hits Back button and resumes application -->
+      <div id="resume-actions-container" style="display: none; margin-top: 20px;">
+        <a id="btn-resume-redirect" href="#" class="btn-submit" style="text-decoration: none; width: 100%; display: flex; justify-content: center; align-items: center; gap: 8px;">
+          <span>Resume Bank Application</span>
+          <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: currentColor;"><path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z"/></svg>
+        </a>
+        <a id="btn-start-new" href="#" style="display: block; margin-top: 15px; color: var(--primary); text-decoration: none; font-size: 0.85rem; font-weight: 600; text-align: center;">Start New Application</a>
       </div>
     </div>
   </div>

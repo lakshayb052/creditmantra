@@ -1,4 +1,11 @@
 // -------------------------------------------------------------
+// UTM CAMPAIGN PARAMETERS PARSING
+// -------------------------------------------------------------
+const urlParams = new URLSearchParams(window.location.search);
+const utmSource = urlParams.get('utm_source') || '';
+const utmInfo = urlParams.get('utm_info') || '';
+
+// -------------------------------------------------------------
 // FALLING MONEY PARTICLE SYSTEM (Canvas)
 // -------------------------------------------------------------
 const canvas = document.getElementById('money-canvas');
@@ -99,23 +106,72 @@ function animateMoney() {
 animateMoney();
 
 // -------------------------------------------------------------
-// SPLASH SCREEN TRANSITION
+// SPLASH SCREEN TRANSITION & RESUME APPLICATION CHECK
 // -------------------------------------------------------------
+const splash = document.getElementById('splash-screen');
+const mainContent = document.getElementById('main-content');
+const successOverlay = document.getElementById('success-modal-overlay');
+const generatedUrmText = document.getElementById('generated-urm');
+const redirectLoadingContainer = document.getElementById('redirect-loading-container');
+const resumeActionsContainer = document.getElementById('resume-actions-container');
+const btnResumeRedirect = document.getElementById('btn-resume-redirect');
+const btnStartNew = document.getElementById('btn-start-new');
+
 window.addEventListener('DOMContentLoaded', () => {
-  const splash = document.getElementById('splash-screen');
-  const mainContent = document.getElementById('main-content');
-  
-  // Keep splash active for 4 seconds
-  setTimeout(() => {
-    splash.style.opacity = '0';
+  // Check if client has a pending submission in sessionStorage
+  const lastLeadId = sessionStorage.getItem('last_lead_id');
+  const lastRedirectUrl = sessionStorage.getItem('last_redirect_url');
+
+  if (lastLeadId && lastRedirectUrl) {
+    // Client has returned (e.g., hit "Back" button) - skip splash screen
+    splash.style.display = 'none';
+    cancelAnimationFrame(animationFrameId); // Stop canvas loops
     
-    // Reveal form
+    // Reveal form layout and open success modal immediately
+    mainContent.classList.add('visible');
+    successOverlay.classList.add('active');
+    
+    // Customize modal text
+    document.getElementById('success-modal-title').innerText = 'Application Pending';
+    document.getElementById('success-modal-desc').innerText = 'It looks like you have an ongoing application. You can resume it below.';
+    generatedUrmText.innerText = lastLeadId;
+
+    // Show Resume action buttons instead of the countdown spinner
+    redirectLoadingContainer.style.display = 'none';
+    resumeActionsContainer.style.display = 'block';
+    btnResumeRedirect.href = lastRedirectUrl;
+  } else {
+    // Standard visitor flow - Keep splash active for 1.5 seconds (reduced from 4s)
     setTimeout(() => {
-      splash.style.display = 'none';
-      cancelAnimationFrame(animationFrameId); // Stop canvas calculation loops
-      mainContent.classList.add('visible');
-    }, 800); // Wait for opacity transition to finish
-  }, 4000);
+      splash.style.opacity = '0';
+      
+      // Reveal form
+      setTimeout(() => {
+        splash.style.display = 'none';
+        cancelAnimationFrame(animationFrameId); // Stop canvas loops
+        mainContent.classList.add('visible');
+      }, 800); // Wait for opacity transition to finish
+    }, 1500);
+  }
+});
+
+// "Start New Application" click handler
+btnStartNew.addEventListener('click', (e) => {
+  e.preventDefault();
+  
+  // Clear stored session state
+  sessionStorage.removeItem('last_lead_id');
+  sessionStorage.removeItem('last_redirect_url');
+  
+  // Hide success overlay modal and reset form fields
+  successOverlay.classList.remove('active');
+  document.getElementById('lead-form').reset();
+  
+  // Restore default success modal states
+  document.getElementById('success-modal-title').innerText = 'Application Submitted!';
+  document.getElementById('success-modal-desc').innerText = 'Thank you for applying. We have successfully registered your interest.';
+  redirectLoadingContainer.style.display = 'flex';
+  resumeActionsContainer.style.display = 'none';
 });
 
 // -------------------------------------------------------------
@@ -123,8 +179,6 @@ window.addEventListener('DOMContentLoaded', () => {
 // -------------------------------------------------------------
 const form = document.getElementById('lead-form');
 const btnSubmit = document.getElementById('btn-submit');
-const successOverlay = document.getElementById('success-modal-overlay');
-const generatedUrmText = document.getElementById('generated-urm');
 
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -184,22 +238,25 @@ form.addEventListener('submit', async (e) => {
       body: JSON.stringify({
         name: nameInput.value.trim(),
         phone: phoneInput.value.trim(),
-        email: emailInput.value.trim()
+        email: emailInput.value.trim(),
+        utm_source: utmSource,
+        utm_info: utmInfo
       })
     });
 
     const data = await response.json();
 
     if (data.success) {
-      // Show Success Modal
+      // Store generated lead and redirect info in sessionStorage for back-button fallback
+      sessionStorage.setItem('last_lead_id', data.lead_id);
+      sessionStorage.setItem('last_redirect_url', data.redirect_url);
+
+      // Render URM ID in modal (just in case they see it briefly or return)
       generatedUrmText.innerText = data.lead_id;
       successOverlay.classList.add('active');
 
-      // 3 second countdown before redirecting to active bank portal
-      setTimeout(() => {
-        window.location.href = data.redirect_url;
-      }, 3000);
-
+      // Redirect immediately (no countdown)
+      window.location.href = data.redirect_url;
     } else {
       alert('Error: ' + (data.message || 'Something went wrong. Please try again.'));
       btnSubmit.disabled = false;
