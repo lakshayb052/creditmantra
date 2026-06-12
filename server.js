@@ -14,6 +14,16 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Redirect direct admin.html requests to clean /admin URL
+app.get('/admin.html', (req, res) => {
+  res.redirect('/admin');
+});
+
+// Serve clean /admin route
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+});
+
 // Serve Static Files
 app.use(express.static(path.join(__dirname, 'public')));
 
