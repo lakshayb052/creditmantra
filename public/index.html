@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CreditMantra - Fast Credit Card & Loan Approval</title>
+  <meta name="description" content="Apply for instant credit card and personal loan approvals. Enter details to check eligibility and generate your bank lead ID.">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <!-- Ambient Glow Blobs in Background -->
+  <div class="glow-blob one"></div>
+  <div class="glow-blob two"></div>
+
+  <!-- Splash Screen (Falling Money Notes) -->
+  <div id="splash-screen">
+    <canvas id="money-canvas"></canvas>
+    
+    <div class="splash-content">
+      <div class="brand-logo-container">
+        <div class="brand-icon-wrapper">
+          <!-- Premium Bank Card & Money Icon -->
+          <svg viewBox="0 0 24 24">
+            <path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+          </svg>
+        </div>
+      </div>
+      <h1 class="brand-title">CreditMantra</h1>
+      <p class="brand-subtitle">Financial Solutions</p>
+      <div class="loader-bar"></div>
+    </div>
+  </div>
+
+  <!-- Main Lead Generation Page -->
+  <main id="main-content">
+    <div class="glass-card">
+      <div class="card-header">
+        <div class="logo-icon-small">
+          <svg viewBox="0 0 24 24">
+            <path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+          </svg>
+        </div>
+        <h1>Apply for Credit Card & Loan</h1>
+        <p>Get instant approvals and custom offers. Fill in your details below.</p>
+      </div>
+
+      <form id="lead-form" novalidate>
+        
+        <!-- Client Name -->
+        <div class="form-group">
+          <input type="text" id="client-name" class="form-control" placeholder=" " required autocomplete="name">
+          <div class="input-icon-wrapper">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+          </div>
+          <label for="client-name" class="form-label">Full Name</label>
+        </div>
+
+        <!-- Contact Number -->
+        <div class="form-group">
+          <input type="tel" id="client-phone" class="form-control" placeholder=" " required autocomplete="tel" pattern="[0-9]{10}">
+          <div class="input-icon-wrapper">
+            <svg viewBox="0 0 24 24">
+              <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+            </svg>
+          </div>
+          <label for="client-phone" class="form-label">Contact Number</label>
+        </div>
+
+        <!-- Email Address -->
+        <div class="form-group">
+          <input type="email" id="client-email" class="form-control" placeholder=" " required autocomplete="email">
+          <div class="input-icon-wrapper">
+            <svg viewBox="0 0 24 24">
+              <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+            </svg>
+          </div>
+          <label for="client-email" class="form-label">Email Address</label>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" id="btn-submit" class="btn-submit">
+          <span>Apply Now</span>
+          <svg viewBox="0 0 24 24">
+            <path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z"/>
+          </svg>
+        </button>
+
+      </form>
+      
+      <div class="card-footer">
+        Secured Application Portal • Powered by CreditMantra
+      </div>
+    </div>
+  </main>
+
+  <!-- Success & URM ID Redirection Modal -->
+  <div id="success-modal-overlay" class="modal-overlay">
+    <div class="success-modal">
+      <div class="success-icon-wrapper">
+        <svg viewBox="0 0 24 24">
+          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+        </svg>
+      </div>
+      <h2>Application Submitted!</h2>
+      <p>Thank you for applying. We have successfully registered your interest.</p>
+      
+      <div class="lead-id-container">
+        <div class="lead-id-label">Your Lead ID / URM No.</div>
+        <div id="generated-urm" class="lead-id-value">CM-HDFC-XXXXXXXX-XXXX</div>
+      </div>
+
+      <div class="redirect-text">
+        <span>Redirecting you to bank portal...</span>
+        <div class="countdown-spinner"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>

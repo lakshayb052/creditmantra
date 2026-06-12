@@ -1,0 +1,29 @@
+{
+  "name": "creditmantra-lead-gen",
+  "version": "1.0.0",
+  "description": "CreditMantra Lead Generation System with Falling Money Splash, Responsive Login, PostgreSQL Database, and Site Admin Dashboard",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [
+    "lead",
+    "generation",
+    "credit-card",
+    "loan",
+    "admin-dashboard",
+    "postgresql"
+  ],
+  "author": "CreditMantra Team",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "pg": "^8.11.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
