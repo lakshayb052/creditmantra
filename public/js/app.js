@@ -141,7 +141,7 @@ window.addEventListener('DOMContentLoaded', () => {
     resumeActionsContainer.style.display = 'block';
     btnResumeRedirect.href = lastRedirectUrl;
   } else {
-    // Standard visitor flow - Keep splash active for 1.5 seconds (reduced from 4s)
+    // Standard visitor flow - Keep splash active for 0.7 seconds (700ms)
     setTimeout(() => {
       splash.style.opacity = '0';
       
@@ -151,7 +151,7 @@ window.addEventListener('DOMContentLoaded', () => {
         cancelAnimationFrame(animationFrameId); // Stop canvas loops
         mainContent.classList.add('visible');
       }, 800); // Wait for opacity transition to finish
-    }, 1500);
+    }, 700);
   }
 });
 
